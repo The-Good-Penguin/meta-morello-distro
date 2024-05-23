@@ -1,0 +1,58 @@
+diff --git a/tc/em_meta.c b/tc/em_meta.c
+index 2ddc65e..a2ba79b 100644
+--- a/tc/em_meta.c
++++ b/tc/em_meta.c
+@@ -144,7 +144,7 @@ static const struct meta_entry *lookup_meta_entry_byid(int id)
+	return NULL;
+ }
+
+-static inline void dump_value(struct nlmsghdr *n, int tlv, unsigned long val,
++static inline void dump_value(struct nlmsghdr *n, int tlv, uintptr_t val,
+			      struct tcf_meta_val *hdr)
+ {
+	__u32 t;
+@@ -247,7 +247,7 @@ static inline int overwrite_type(struct tcf_meta_val *src,
+
+ static inline struct bstr *
+ parse_object(struct bstr *args, struct bstr *arg, struct tcf_meta_val *obj,
+-	     unsigned long *dst, struct tcf_meta_val *left)
++	     uintptr_t *dst, struct tcf_meta_val *left)
+ {
+	const struct meta_entry *entry;
+	unsigned long num;
+@@ -256,7 +256,7 @@ parse_object(struct bstr *args, struct bstr *arg, struct tcf_meta_val *obj,
+	if (arg->quoted) {
+		obj->kind = TCF_META_TYPE_VAR << 12;
+		obj->kind |= TCF_META_ID_VALUE;
+-		*dst = (unsigned long) arg;
++		*dst = (uintptr_t) arg;
+		return bstr_next(arg);
+	}
+
+@@ -264,7 +264,7 @@ parse_object(struct bstr *args, struct bstr *arg, struct tcf_meta_val *obj,
+	if (num != ULONG_MAX) {
+		obj->kind = TCF_META_TYPE_INT << 12;
+		obj->kind |= TCF_META_ID_VALUE;
+-		*dst = (unsigned long) num;
++		*dst = (uintptr_t) num;
+		return bstr_next(arg);
+	}
+
+@@ -342,7 +342,7 @@ compatible:
+				    "numeric");
+				return PARSE_FAILURE;
+			}
+-			*dst = (unsigned long) mask;
++			*dst = (uintptr_t) mask;
+			a = bstr_next(a);
+		} else
+			break;
+@@ -361,7 +361,7 @@ static int meta_parse_eopt(struct nlmsghdr *n, struct tcf_ematch_hdr *hdr,
+	int opnd;
+	struct bstr *a;
+	struct tcf_meta_hdr meta_hdr = {};
+-	unsigned long lvalue = 0, rvalue = 0;
++	uintptr_t lvalue = 0, rvalue = 0;
+
+	if (args == NULL)
+		return PARSE_ERR(args, "meta: missing arguments");
