@@ -87,7 +87,7 @@ PTEST_BUILD_HOST_FILES  += "configdata.pm"
 PTEST_BUILD_HOST_PATTERN = "perl_version ="
 do_install_ptest () {
 
-  local ptest_path = "${D}${PURECAP_SYSROOT_DIR}${PTEST_PATH}"
+  local ptest_path = "${D}${libdir}/libssl/ptest/"
   install -d ${ptest_path}
   install -d ${ptest_path}/test
   install -m755 ${B}/test/p_test.so ${ptest_path}/test
