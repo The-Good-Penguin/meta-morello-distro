@@ -10,11 +10,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a \
                     file://ip/ip.c;beginline=3;endline=8;md5=689d691d0410a4b64d3899f8d6e31817"
 
 inherit update-alternatives bash-completion pkgconfig pure-cap-kheaders
-inherit purecap-sysroot
+# inherit purecap-sysroot
 
 DEPENDS = "flex-native bison-native iptables-morello libcap-ng"
 #DEPENDS += " libmnl-morello"
-#DEPENDS += " musl"
+# DEPENDS += " musl"
 
 TOOLCHAIN = "${MORELLO_TOOLCHAIN}"
 
@@ -31,7 +31,7 @@ IPROUTE2_MAKE_SUBDIRS = "lib tc ip bridge misc genl ${@bb.utils.filter('PACKAGEC
 
 EXTRA_OEMAKE = "\
     CC='${CC}' \
-    KERNEL_INCLUDE=${STAGING_DIR_TARGET}${prefix}/src/linux-headers-morello/include \
+    KERNEL_INCLUDE=${STAGING_DIR_TARGET}${PURECAP_SYSROOT_DIR}${prefix}/src/linux-headers-morello/include \
     DOCDIR=${docdir}/iproute2 \
     SUBDIRS='${IPROUTE2_MAKE_SUBDIRS}' \
     SBINDIR='${base_sbindir}' \
@@ -41,7 +41,7 @@ EXTRA_OEMAKE = "\
 S = "${WORKDIR}/${PN_DL}-${PV}"
 
 do_configure() {
-     sh configure --include_dir=${STAGING_DIR_TARGET}${prefix}/src/linux-headers-morello/include
+     sh configure --include_dir=${STAGING_DIR_TARGET}${PURECAP_SYSROOT_DIR}${prefix}/src/linux-headers-morello/include
 #    # Explicitly disable ATM support
      sed -i -e '/TC_CONFIG_ATM/d' config.mk
 #    # possibly the configure script is broken because all the test programs
@@ -63,11 +63,10 @@ do_configure() {
 }
 
 do_install () {
-    oe_runmake DESTDIR=${D} install
-    cp ${D}${base_sbindir}/ip ${D}${base_sbindir}/ip.iproute2
-    install -d ${D}${datadir}
-    mv ${D}/share/* ${D}${datadir}/ || true
-    rm ${D}/share -rf || true
+    oe_runmake DESTDIR=${D}${PURECAP_SYSROOT_DIR} install
+    install -d ${D}${PURECAP_SYSROOT_DIR}${datadir}
+    install -d ${D}${PURECAP_SYSROOT_DIR}${base_sbindir}
+    cp ${D}${PURECAP_SYSROOT_DIR}${base_sbindir}/ip ${D}${PURECAP_SYSROOT_DIR}${base_sbindir}/ip.iproute2
 }
 
 # The .so files in iproute2-tc are modules, not traditional libraries
@@ -107,42 +106,42 @@ RDEPENDS:${PN_DL} += "${PN_DL}-ip"
 #PROVIDES:${PN} += " ${PN} ${PN}-dev"
 
 FILES:${PN} = "\
-  ${exec_prefix}/* \
-  ${localstatedir}/* \
-  ${sysconfdir}/* \
-  ${base_sbindir}/* \
+  ${PURECAP_SYSROOT_DIR}${exec_prefix}/* \
+  ${PURECAP_SYSROOT_DIR}${localstatedir}/* \
+  ${PURECAP_SYSROOT_DIR}${sysconfdir}/* \
+  ${PURECAP_SYSROOT_DIR}${base_sbindir}/* \
 "
 
-FILES:${PN}-tc = "${base_sbindir}/tc* \
-                  ${libdir}/tc/*.so"
-FILES:${PN}-lnstat = "${base_sbindir}/lnstat \
-                      ${base_sbindir}/ctstat \
-                      ${base_sbindir}/rtstat"
-FILES:${PN}-ifstat = "${base_sbindir}/ifstat"
+FILES:${PN}-tc = "${PURECAP_SYSROOT_DIR}${base_sbindir}/tc* \
+                  ${PURECAP_SYSROOT_DIR}${libdir}/tc/*.so"
+FILES:${PN}-lnstat = "${PURECAP_SYSROOT_DIR}${base_sbindir}/lnstat \
+                      ${PURECAP_SYSROOT_DIR}${base_sbindir}/ctstat \
+                      ${PURECAP_SYSROOT_DIR}${base_sbindir}/rtstat"
+FILES:${PN}-ifstat = "${PURECAP_SYSROOT_DIR}${base_sbindir}/ifstat"
 FILES:${PN}-ip = "\
-  ${base_sbindir}/ip.${PN_DL} \
-  ${sysconfdir}/iproute2 \
-  ${exec_prefix}/* \
-  ${localstatedir}/* \
-  ${base_sbindir}/bridge \
-  ${base_sbindir}/rtmon \
-  ${base_sbindir}/routel \
+  ${PURECAP_SYSROOT_DIR}{base_sbindir}/ip.${PN_DL} \
+  ${PURECAP_SYSROOT_DIR}{sysconfdir}/iproute2 \
+  ${PURECAP_SYSROOT_DIR}{exec_prefix}/* \
+  ${PURECAP_SYSROOT_DIR}{localstatedir}/* \
+  ${PURECAP_SYSROOT_DIR}{base_sbindir}/bridge \
+  ${PURECAP_SYSROOT_DIR}{base_sbindir}/rtmon \
+  ${PURECAP_SYSROOT_DIR}{base_sbindir}/routel \
 "
-FILES:${PN}-genl = "${base_sbindir}/genl"
-FILES:${PN}-rtacct = "${base_sbindir}/rtacct"
-FILES:${PN}-nstat = "${base_sbindir}/nstat"
-FILES:${PN}-ss = "${base_sbindir}/ss"
-FILES:${PN}-tipc = "${base_sbindir}/tipc"
-FILES:${PN}-devlink = "${base_sbindir}/devlink"
-FILES:${PN}-rdma = "${base_sbindir}/rdma"
+FILES:${PN}-genl = "${PURECAP_SYSROOT_DIR}${base_sbindir}/genl"
+FILES:${PN}-rtacct = "${PURECAP_SYSROOT_DIR}${base_sbindir}/rtacct"
+FILES:${PN}-nstat = "${PURECAP_SYSROOT_DIR}${base_sbindir}/nstat"
+FILES:${PN}-ss = "${PURECAP_SYSROOT_DIR}${base_sbindir}/ss"
+FILES:${PN}-tipc = "${PURECAP_SYSROOT_DIR}${base_sbindir}/tipc"
+FILES:${PN}-devlink = "${PURECAP_SYSROOT_DIR}${base_sbindir}/devlink"
+FILES:${PN}-rdma = "${PURECAP_SYSROOT_DIR}${base_sbindir}/rdma"
 
-ALTERNATIVE:${PN_DL}-ip = "ip"
-ALTERNATIVE_TARGET[ip] = "${base_sbindir}/ip.${BPN}"
-ALTERNATIVE_LINK_NAME[ip] = "${base_sbindir}/ip"
+ALTERNATIVE:${PN_DL}-ip = "${PURECAP_SYSROOT_DIR}${base_sbindir}/ip"
+ALTERNATIVE_TARGET[ip] = "${PURECAP_SYSROOT_DIR}${base_sbindir}/ip.${BPN}"
+ALTERNATIVE_LINK_NAME[ip] = "${PURECAP_SYSROOT_DIR}${base_sbindir}/ip"
 ALTERNATIVE_PRIORITY = "100"
 
 ALTERNATIVE:${PN_DL}-tc = "tc"
-ALTERNATIVE_LINK_NAME[tc] = "${base_sbindir}/tc"
+ALTERNATIVE_LINK_NAME[tc] = "${PURECAP_SYSROOT_DIR}${base_sbindir}/tc"
 ALTERNATIVE_PRIORITY_${PN_DL}-tc = "100"
 
 #do_package_qa[noexec] = "1"
