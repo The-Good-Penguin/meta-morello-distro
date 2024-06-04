@@ -1,0 +1,21 @@
+[Unit]
+Description=Zabbix Server Init
+Wants=postgresql.service
+After=postgresql.service
+After=postgresql-init.service
+After=php-fpm.service
+
+[Service]
+Environment="SYSCONFDIR=%SYSCONFDIR%"
+Environment="CONFFILE=%SYSCONFDIR%/zabbix/zabbix-server.conf"
+Environment="DB_ZABBIX_USER_SERVER=%DB_ZABBIX_USER_SERVER%"
+Environment="DB_ZABBIX_NAME=%DB_ZABBIX_NAME%"
+Environment="DB_ZABBIX_PASSWORD=%DB_ZABBIX_PASSWORD%"
+Environment="ZABBIX_SCHEMA_LOCATION=%ZABBIX_SCHEMA_LOCATION%"
+EnvironmentFile=-%SYSCONFDIR%/default/zabbix-server
+Type=oneshot
+KillMode=control-group
+ExecStart=/bin/bash -c '%SYSCONFDIR%/zabbix/zabbix-server-init.sh'
+
+[Install]
+WantedBy=multi-user.target
