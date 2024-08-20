@@ -1,0 +1,3 @@
+[properties]
+can_run_host_binaries = false
+skip_sanity_check = true

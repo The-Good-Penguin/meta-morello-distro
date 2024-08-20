@@ -1,0 +1,59 @@
+From 115959af31829340ea9fbab37e44e879e481f6b6 Mon Sep 17 00:00:00 2001
+From: Michael Cobb <michael.cobb@iceotope.com>
+Date: Wed, 12 Jun 2024 11:22:54 +0100
+Subject: [PATCH] Add option to disable testing host binaries when
+ cross-compiling
+
+Fixes the 'frexpl() is missing or broken beyond repair' build error due
+to meson trying to run tests under qemu
+
+Signed-off-by: Michael Cobb <michael.cobb@iceotope.com>
+
+---
+ meson.build       | 5 +++--
+ meson_options.txt | 5 +++++
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 31f90ece1..ebb7b0b5b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -32,7 +32,7 @@ if have_cxx
+   endforeach
+ endif
+ 
+-cc_can_run = meson.can_run_host_binaries()
++cc_can_run = get_option('can_run_host_binaries') and meson.can_run_host_binaries()
+ 
+ if cc.get_argument_syntax() == 'msvc'
+   # Ignore several spurious warnings for things glib does very commonly
+@@ -1445,7 +1445,7 @@ endif
+ # library type. Test for the warnings and set gint64 to whichever
+ # works.
+ if long_long_size == long_size
+-  if cc.compiles('''#if defined(_AIX) && !defined(__GNUC__)
++  r = cc.compiles('''#if defined(_AIX) && !defined(__GNUC__)
+                     #pragma options langlvl=stdc99
+                     #endif
+                     #pragma GCC diagnostic error "-Wincompatible-pointer-types"
+@@ -1456,6 +1456,7 @@ if long_long_size == long_size
+                       long *i2 = &i1;
+                       return 1;
+                     }''', name : 'int64_t is long')
++  if r
+     int64_t_typedef = 'long'
+   elif cc.compiles('''#if defined(_AIX) && !defined(__GNUC__)
+                       #pragma options langlvl=stdc99
+diff --git a/meson_options.txt b/meson_options.txt
+index 324351cf7..03975ed43 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -136,3 +136,8 @@ option('disable_cxx',
+        type: 'boolean',
+        value: false,
+        description: 'Disable the use of C++ compiler for tests if your platform does not have a working C++ compiler')
++
++option('can_run_host_binaries',
++       type: 'boolean',
++       value: true,
++       description: 'Disable if cross-compiling and your platform does not have a way to run compiled host binaries')

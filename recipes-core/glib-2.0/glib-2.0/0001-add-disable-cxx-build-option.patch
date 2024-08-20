@@ -1,0 +1,36 @@
+From a43ffde17d160e07364b8352925b1c31009b7dfe Mon Sep 17 00:00:00 2001
+From: Michael Cobb <michael.cobb@iceotope.com>
+Date: Wed, 12 Jun 2024 10:13:50 +0100
+Subject: [PATCH] add disable cxx build option
+
+---
+ meson.build       | 2 +-
+ meson_options.txt | 5 +++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 17d7bc08e..73523db34 100644
+--- a/meson.build
++++ b/meson.build
+@@ -19,7 +19,7 @@ foreach std : ['90', '99', '11', '17']
+   endif
+ endforeach
+ 
+-have_cxx = add_languages('cpp', native: false, required: get_option('oss_fuzz').enabled())
++have_cxx = not get_option('disable_cxx') and add_languages('cpp', native: false, required: get_option('oss_fuzz').enabled())
+ if have_cxx
+   cxx = meson.get_compiler('cpp')
+   cxx_standards = {}
+diff --git a/meson_options.txt b/meson_options.txt
+index 517d5757c..09ddc9318 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -125,3 +125,8 @@ option('multiarch',
+        type : 'boolean',
+        value : false,
+        description : 'Install some helper executables in per-architecture locations')
++
++option('disable_cxx',
++       type: 'boolean',
++       value: false,
++       description: 'Disable the use of C++ compiler for tests if your platform does not have a working C++ compiler')
