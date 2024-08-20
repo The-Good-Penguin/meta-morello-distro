@@ -1,0 +1,65 @@
+From 208cb325d15f016d2fb58e11b1d97e1e4d85739b Mon Sep 17 00:00:00 2001
+From: Michael Cobb <michael.cobb@iceotope.com>
+Date: Wed, 12 Jun 2024 16:37:18 +0100
+Subject: [PATCH] Add --enable-cheri-ffi-closures flag to enable FFI closures
+ on CHERI
+
+---
+ configure.ac            | 9 +++++++++
+ include/ffi.h.in        | 4 ++++
+ src/aarch64/ffitarget.h | 3 ++-
+ 3 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 70f6d2c..fbc0125 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -234,6 +234,15 @@ esac
+ AM_CONDITIONAL(FFI_EXEC_TRAMPOLINE_TABLE, test x$FFI_EXEC_TRAMPOLINE_TABLE = x1)
+ AC_SUBST(FFI_EXEC_TRAMPOLINE_TABLE)
+ 
++CHERI_FFI_CLOSURES = 0
++AC_ARG_ENABLE(cheri-ffi-closures,
++[  --enable-cheri-ffi-closures  enable FFI closures on CHERI targets],
++  if test "$enable_cheri_ffi_closures" = "yes"; then
++    CHERI_FFI_CLOSURES=1
++    AC_DEFINE(CHERI_FFI_CLOSURES, 1, [Define if you wish to enable FFI closures on CHERI targets])
++    AC_SUBST(CHERI_FFI_CLOSURES)
++  fi)
++
+ if test x$TARGET = xX86_64; then
+     AC_CACHE_CHECK([toolchain supports unwind section type],
+ 	libffi_cv_as_x86_64_unwind_section_type, [
+diff --git a/include/ffi.h.in b/include/ffi.h.in
+index 9fd7a59..42a0cff 100644
+--- a/include/ffi.h.in
++++ b/include/ffi.h.in
+@@ -56,6 +56,10 @@ extern "C" {
+ 
+ /* ---- System configuration information --------------------------------- */
+ 
++#if defined(__CHERI_PURE_CAPABILITY__) && !defined(CHERI_FFI_CLOSURES)
++#define CHERI_FFI_CLOSURES @CHERI_FFI_CLOSURES@
++#endif
++
+ #include <ffitarget.h>
+ 
+ #ifndef LIBFFI_ASM
+diff --git a/src/aarch64/ffitarget.h b/src/aarch64/ffitarget.h
+index 91585c3..17e5b0b 100644
+--- a/src/aarch64/ffitarget.h
++++ b/src/aarch64/ffitarget.h
+@@ -61,11 +61,12 @@ typedef enum ffi_abi
+ 
+ /* ---- Definitions for closures ----------------------------------------- */
+ 
+-#if defined(__CHERI_PURE_CAPABILITY__)
++#if defined(__CHERI_PURE_CAPABILITY__) && !defined(CHERI_FFI_CLOSURES)
+ /* Not implemented yet for purecap. */
+ #define FFI_CLOSURES 0
+ #else
+ #define FFI_CLOSURES 1
++#warning "FFI_CLOSURES is enabled but this feature may not be supported for purecap"
+ #endif
+ #define FFI_NATIVE_RAW_API 0
+ 
