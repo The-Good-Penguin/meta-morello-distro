@@ -11,7 +11,7 @@ TOOLCHAIN = "${MORELLO_TOOLCHAIN}"
 PV = "2.37.4"
 
 S = "${WORKDIR}/util-linux-${PV}"
-EXTRA_OECONF += "--disable-all-programs --enable-libuuid"
+EXTRA_OECONF += "--disable-all-programs --enable-libuuid --enable-libblkid --enable-libmount"
 LICENSE = "BSD-3-Clause"
 
 do_install() {
