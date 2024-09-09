@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - 'master'
-
+      - 'kirkstone-next'
 env:
   BUILD_DIR: ${{github.workspace}}/volatile
 
