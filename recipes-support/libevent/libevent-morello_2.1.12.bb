@@ -41,7 +41,7 @@ LEAD_SONAME = "libevent-2.1.so"
 
 PACKAGES_DYNAMIC = "^${PN}-.*$"
 python split_libevent_libs () {
-    do_split_packages(d, '${libdir}', r'^libevent_([a-z]*)-.*\.so\..*', 'libevent-%s', '${SUMMARY} (%s)', prepend=True, allow_links=True)
+    do_split_packages(d, '${libdir}', r'^libevent_([a-z]*)-.*\.so\..*', 'libevent-morello-%s', '${SUMMARY} (%s)', prepend=True, allow_links=True)
 }
 PACKAGESPLITFUNCS:prepend = "split_libevent_libs "
 
