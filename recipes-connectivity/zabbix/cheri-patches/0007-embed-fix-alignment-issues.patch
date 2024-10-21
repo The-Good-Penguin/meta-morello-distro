@@ -1,7 +1,7 @@
-From f6c3242099c8ee29ed5e9d9bfb0ee65661f5321f Mon Sep 17 00:00:00 2001
+From 278989e4c3acee4e329fd83f1c1149d8a332459b Mon Sep 17 00:00:00 2001
 From: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
 Date: Tue, 28 Nov 2023 09:50:06 +0000
-Subject: [PATCH 5/7] embed: fix alignment issues
+Subject: [PATCH 07/10] embed: fix alignment issues
 
 The zabbix internal embed allocators will take a properly aligned
 pointer, cast it to u64 pointer store the allocated size in its
@@ -15,11 +15,11 @@ preferably a data object should be created here with [.size, .pdata]
 
 Signed-off-by: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
 ---
- src/libs/zbxembed/embed.c | 29 +++++++++++++++++++++++------
- 1 file changed, 23 insertions(+), 6 deletions(-)
+ src/libs/zbxembed/embed.c | 39 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 37 insertions(+), 2 deletions(-)
 
 diff --git a/src/libs/zbxembed/embed.c b/src/libs/zbxembed/embed.c
-index 23b0d47..f4b3a22 100644
+index 187ef0edc19..f0b4b5eabff 100644
 --- a/src/libs/zbxembed/embed.c
 +++ b/src/libs/zbxembed/embed.c
 @@ -39,6 +39,22 @@
@@ -45,49 +45,68 @@ index 23b0d47..f4b3a22 100644
  /******************************************************************************
   *                                                                            *
   * Function: es_handle_error                                                  *
-@@ -78,7 +94,7 @@ static void	*es_malloc(void *udata, duk_size_t size)
+@@ -61,6 +77,8 @@ static void	es_handle_error(void *udata, const char *msg)
+  * Memory allocation routines to track and limit script memory usage.
+  */
+ 
++#define ALLOC_LOG_LEVEL  42
++
+ static void	*es_malloc(void *udata, duk_size_t size)
+ {
+ 	zbx_es_env_t	*env = (zbx_es_env_t *)udata;
+@@ -76,8 +94,14 @@ static void	*es_malloc(void *udata, duk_size_t size)
+ 
+ 	env->total_alloc += (size + ZBX_ES_PAD);
  	uptr = zbx_malloc(NULL, size + ZBX_ES_PAD);
++
++  zabbix_log( ALLOC_LOG_LEVEL	, "==== [%p] Allocated %d, total alloc [%d]", uptr, size + ZBX_ES_PAD, env->total_alloc);
++
  	*uptr++ = size;
  
--	return uptr;
-+	return TYPEALIGN(16,uptr);
++  uptr = TYPEALIGN(16,uptr);
++  zabbix_log( ALLOC_LOG_LEVEL	, "==== Returning %p ", uptr);
++
+ 	return uptr;
  }
  
- static void	*es_realloc(void *udata, void *ptr, duk_size_t size)
-@@ -90,7 +106,7 @@ static void	*es_realloc(void *udata, void *ptr, duk_size_t size)
+@@ -89,7 +113,7 @@ static void	*es_realloc(void *udata, void *ptr, duk_size_t size)
+ 
  	if (NULL != uptr)
  	{
- 		--uptr;
--		old_size = *uptr + ZBX_ES_PAD;
-+		old_size = *TYPEALIGN_DOWN(16,uptr) + ZBX_ES_PAD;
+-		--uptr;
++		uptr = TYPEALIGN_DOWN(16,--uptr);
+ 		old_size = *uptr + ZBX_ES_PAD;
  	}
  	else
- 		old_size = 0;
-@@ -104,10 +120,10 @@ static void	*es_realloc(void *udata, void *ptr, duk_size_t size)
- 	}
+@@ -105,8 +129,14 @@ static void	*es_realloc(void *udata, void *ptr, duk_size_t size)
  
  	env->total_alloc += size + ZBX_ES_PAD - old_size;
--	uptr = zbx_realloc(uptr, size + ZBX_ES_PAD);
-+	uptr = zbx_realloc(TYPEALIGN_DOWN(16,uptr), size + ZBX_ES_PAD);
+ 	uptr = zbx_realloc(uptr, size + ZBX_ES_PAD);
++
++  zabbix_log( ALLOC_LOG_LEVEL	, "==== [%p] Reallocated %d, total alloc [%d]",uptr, size + ZBX_ES_PAD, env->total_alloc);
++
  	*uptr++ = size;
  
--	return uptr;
-+	return TYPEALIGN(16, uptr);
++  uptr = TYPEALIGN(16,uptr);
++  zabbix_log( ALLOC_LOG_LEVEL	, "==== Returning %p ", uptr);
++
+ 	return uptr;
  }
  
- static void	es_free(void *udata, void *ptr)
-@@ -117,8 +133,9 @@ static void	es_free(void *udata, void *ptr)
+@@ -117,7 +147,12 @@ static void	es_free(void *udata, void *ptr)
  
  	if (NULL != ptr)
  	{
 -		env->total_alloc -= (*(--uptr) + ZBX_ES_PAD);
--		zbx_free(uptr);
-+		env->total_alloc -= (*(TYPEALIGN_DOWN(16,--uptr)) + ZBX_ES_PAD);
-+		void * ptr_aligned = TYPEALIGN_DOWN(16,uptr);
-+		zbx_free(ptr_aligned);
++    uptr = TYPEALIGN_DOWN(16,--uptr);
++
++    env->total_alloc -= (*uptr + ZBX_ES_PAD);
++
++    zabbix_log( ALLOC_LOG_LEVEL, "==== [%p] Freed %d, total alloc [%d]", uptr, *uptr + ZBX_ES_PAD, env->total_alloc);
++
+ 		zbx_free(uptr);
  	}
  }
- 
 -- 
-2.34.1
+2.47.1
 

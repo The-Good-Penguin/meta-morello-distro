@@ -29,27 +29,29 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/cheri-patches:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 TOOLCHAIN                = "${MORELLO_TOOLCHAIN}"
 
-PV   = "5.0.38"
+PV   = "5.0.46"
 PNPV = "zabbix-${PV}"
 SRC_URI = " \
     https://cdn.zabbix.com/zabbix/sources/stable/5.0/${PNPV}.tar.gz \
     "
 
-SRC_URI += "file://0000-sysinfo-fix-build-with-musl-libc.patch \
-            file://0000-net-fix-provenance-error.patch \
-            file://0001-memalloc-align-and-work-with-16-not-8.patch \
-            file://0002-duktape-set-shift-to-5-for-CHERI.patch \
-            file://0003-duktape-add-aling-to-16.patch \
-            file://0004-embed-use-padding-of-16-not-8-for-alloc.patch \
-            file://0005-embed-fix-alignment-issues.patch \
-            file://0006-duk_config-use-debug-and-self-test.patch \
-            file://0007-duktape-fix-stack-reallocation.patch \
+SRC_URI += "file://0001-net-fix-provenance-error.patch \
+            file://0002-sysinfo-fix-build-with-musl-libc.patch \
+            file://0003-memalloc-align-and-work-with-16-not-8.patch \
+            file://0004-duktape-set-shift-to-5-for-CHERI.patch \
+            file://0005-duktape-add-aling-to-16.patch \
+            file://0006-embed-use-padding-of-16-not-8-for-allocators.patch \
+            file://0007-embed-fix-alignment-issues.patch \
+            file://0008-duk_config-use-debug-and-self-test.patch \
+            file://0009-duk_api_stack-fix-stack-reallocation.patch \
+            file://0010-httprequest-change-flags-and-request.patch \
             "
+
 
 S = "${WORKDIR}/zabbix-${PV}"
 
-SRC_URI[md5sum]    = "0d314f8626cf5e914204c7e0c4f9ca78"
-SRC_URI[sha256sum] = "765c36aa0fc9dbf27f9eab06ccfe4e71023264d398d361b1dae0a3c1fe4c1a26"
+SRC_URI[md5sum]    = "293af2d0a17e1fa3e9ecc44d36022365"
+SRC_URI[sha256sum] = "a7a39900ba4e406eafef4636d1c0b66dd9734c8373dc905df6a19664009f725e"
 
 DEPENDS += "postgresql-morello zlib-morello net-snmp-morello openldap-morello libpcre-morello libevent-morello"
 DEPENDS += "curl-morello"
@@ -59,7 +61,7 @@ RDEPENDS:${PN} = " \
             "
 
 
-PACKAGECONFIG:append = " net-snmp libevent ldap zlib libpthread iconv curl libpcre openssl"
+PACKAGECONFIG:append = " net-snmp libevent ldap zlib libpthread iconv curl libpcre"
 
 PACKAGECONFIG[openssl]    = "--with-openssl=${STAGING_EXECPREFIXDIR},--without-openssl,openssl-morello"
 PACKAGECONFIG[net-snmp]   = "--with-net-snmp=${STAGING_BINDIR}/net-snmp-config,--without-net-snmp,net-snmp-morello"

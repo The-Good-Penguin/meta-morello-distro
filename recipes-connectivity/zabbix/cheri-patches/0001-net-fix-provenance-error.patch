@@ -1,7 +1,7 @@
-From 79323bc3b45a0fb67168dd91dc1cc72e200e7392 Mon Sep 17 00:00:00 2001
+From 68cde7396f8dc84792e532c051dd789fb2abb9df Mon Sep 17 00:00:00 2001
 From: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
 Date: Fri, 7 Jul 2023 17:10:02 +0100
-Subject: [PATCH 4/4] net: fix provenance error
+Subject: [PATCH 01/10] net: fix provenance error
 
 Socket expects an int, just cast the NULL to an int.
 
@@ -11,10 +11,10 @@ Signed-off-by: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/libs/zbxsysinfo/linux/net.c b/src/libs/zbxsysinfo/linux/net.c
-index 9e9fe73..55e2986 100644
+index 848af1138d7..d82139db993 100644
 --- a/src/libs/zbxsysinfo/linux/net.c
 +++ b/src/libs/zbxsysinfo/linux/net.c
-@@ -112,13 +112,13 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
+@@ -96,13 +96,13 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
  
  	struct sockaddr_nl	s_sa = { AF_NETLINK, 0, 0, 0 };
  	struct iovec		s_io[1] = { { &request, sizeof(request) } };
@@ -31,5 +31,5 @@ index 9e9fe73..55e2986 100644
  	struct nlmsghdr		*r_hdr;
  
 -- 
-2.34.1
+2.47.1
 

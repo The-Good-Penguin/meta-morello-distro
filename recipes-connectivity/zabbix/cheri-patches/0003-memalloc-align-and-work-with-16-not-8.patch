@@ -1,7 +1,7 @@
-From ff061121e98773c7e144e884bf1f8fa96c5dd0a7 Mon Sep 17 00:00:00 2001
+From 50e9ce7f38a150f8030453f6073ece353ca9e19d Mon Sep 17 00:00:00 2001
 From: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
 Date: Mon, 13 Nov 2023 12:11:16 +0000
-Subject: [PATCH 1/7] memalloc: align and work with 16, not 8
+Subject: [PATCH 03/10] memalloc: align and work with 16, not 8
 
 Signed-off-by: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
 ---
@@ -10,7 +10,7 @@ Signed-off-by: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
  2 files changed, 28 insertions(+), 16 deletions(-)
 
 diff --git a/include/memalloc.h b/include/memalloc.h
-index 858c509..f449cd1 100644
+index b6da324c44d..5f7e3683388 100644
 --- a/include/memalloc.h
 +++ b/include/memalloc.h
 @@ -23,7 +23,7 @@
@@ -23,7 +23,7 @@ index 858c509..f449cd1 100644
  #define MEM_MIN_BUCKET_SIZE	MEM_MIN_ALLOC
  #define MEM_MAX_BUCKET_SIZE	256 /* starting from this size all free chunks are put into the same bucket */
 diff --git a/src/libs/zbxmemory/memalloc.c b/src/libs/zbxmemory/memalloc.c
-index f3d9618..1d88dfd 100644
+index b3a88e6c175..1e8701ae396 100644
 --- a/src/libs/zbxmemory/memalloc.c
 +++ b/src/libs/zbxmemory/memalloc.c
 @@ -92,6 +92,7 @@
@@ -164,5 +164,5 @@ index f3d9618..1d88dfd 100644
  	size += (chunks_num - 1) * MEM_SIZE_FIELD * 2;	/* each additional chunk requires 16 bytes of overhead */
  	size += chunks_num * (MEM_MIN_ALLOC - 1);	/* each chunk has size of at least MEM_MIN_ALLOC bytes */
 -- 
-2.34.1
+2.47.1
 

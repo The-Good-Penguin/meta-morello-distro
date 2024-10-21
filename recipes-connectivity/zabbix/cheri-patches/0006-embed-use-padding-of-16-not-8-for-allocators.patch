@@ -1,15 +1,31 @@
-From 309955f76bf0252ee73ca234d94d0419371d7e83 Mon Sep 17 00:00:00 2001
+From 2b8f6be3ad2973ac972c28615366bfc9badb4609 Mon Sep 17 00:00:00 2001
 From: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
 Date: Mon, 27 Nov 2023 10:32:37 +0000
-Subject: [PATCH 4/7] embed: use padding of 16 not 8 for allocators
+Subject: [PATCH 06/10] embed: use padding of 16 not 8 for allocators
 
 Signed-off-by: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
 ---
+ include/memalloc.h        |  4 ++--
  src/libs/zbxembed/embed.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
+ 2 files changed, 14 insertions(+), 12 deletions(-)
 
+diff --git a/include/memalloc.h b/include/memalloc.h
+index 5f7e3683388..41c0e28385b 100644
+--- a/include/memalloc.h
++++ b/include/memalloc.h
+@@ -26,8 +26,8 @@
+ #define MEM_MIN_ALLOC	(3*ZBX_PTR_SIZE)	/* should be a multiple of 8 and at least (2 * ZBX_PTR_SIZE) */
+ 
+ #define MEM_MIN_BUCKET_SIZE	MEM_MIN_ALLOC
+-#define MEM_MAX_BUCKET_SIZE	256 /* starting from this size all free chunks are put into the same bucket */
+-#define MEM_BUCKET_COUNT	((MEM_MAX_BUCKET_SIZE - MEM_MIN_BUCKET_SIZE) / 8 + 1)
++#define MEM_MAX_BUCKET_SIZE	512 /* starting from this size all free chunks are put into the same bucket */
++#define MEM_BUCKET_COUNT	((MEM_MAX_BUCKET_SIZE - MEM_MIN_BUCKET_SIZE) / 16 + 1)
+ 
+ typedef struct
+ {
 diff --git a/src/libs/zbxembed/embed.c b/src/libs/zbxembed/embed.c
-index 0e1b349..23b0d47 100644
+index 407c8e0d7c0..187ef0edc19 100644
 --- a/src/libs/zbxembed/embed.c
 +++ b/src/libs/zbxembed/embed.c
 @@ -28,8 +28,10 @@
@@ -81,5 +97,5 @@ index 0e1b349..23b0d47 100644
  	}
  }
 -- 
-2.34.1
+2.47.1
 

@@ -1,7 +1,7 @@
-From 564a236360252558b2ac360e30d5d141b8c8ed1a Mon Sep 17 00:00:00 2001
+From 8f78362b4d80f89aa2f3657873bee9b016c73591 Mon Sep 17 00:00:00 2001
 From: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
 Date: Tue, 28 Nov 2023 10:43:58 +0000
-Subject: [PATCH 2/7] duktape: set shift to 5 for CHERI
+Subject: [PATCH 04/10] duktape: set shift to 5 for CHERI
 
 The duk_tval struct is of size 5 now
 
@@ -11,7 +11,7 @@ Signed-off-by: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
  1 file changed, 10 insertions(+)
 
 diff --git a/src/libs/zbxembed/duktape.c b/src/libs/zbxembed/duktape.c
-index da87cb0..e3b439f 100644
+index da87cb0de33..e3b439f6e3a 100644
 --- a/src/libs/zbxembed/duktape.c
 +++ b/src/libs/zbxembed/duktape.c
 @@ -51113,6 +51113,11 @@ duk_heap *duk_heap_alloc(duk_alloc_function alloc_func,
@@ -51,5 +51,5 @@ index da87cb0..e3b439f 100644
  #define DUK__SHIFT_B         (DUK_BC_SHIFT_B - DUK__TVAL_SHIFT)
  #define DUK__SHIFT_C         (DUK_BC_SHIFT_C - DUK__TVAL_SHIFT)
 -- 
-2.34.1
+2.47.1
 

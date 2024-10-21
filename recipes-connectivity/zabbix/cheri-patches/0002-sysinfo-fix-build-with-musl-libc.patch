@@ -1,7 +1,7 @@
-From d35e95600ee80e4c526a7ed1ab6bbda2bc0c8427 Mon Sep 17 00:00:00 2001
+From 57740a2200b107a7fe0954282ee32e28b10ddeb2 Mon Sep 17 00:00:00 2001
 From: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
 Date: Fri, 7 Jul 2023 15:21:23 +0100
-Subject: [PATCH 1/4] sysinfo: fix build with musl libc
+Subject: [PATCH 02/10] sysinfo: fix build with musl libc
 
 If we use <sys/sysinfo.h> and a musl libc we will get
 redefinition error of the sysinfo struct due to <linux/kernel.h>
@@ -14,7 +14,7 @@ Signed-off-by: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/include/sysinc.h b/include/sysinc.h
-index 1400ca8..f34356d 100644
+index 75ba1b59629..85237a3d950 100644
 --- a/include/sysinc.h
 +++ b/include/sysinc.h
 @@ -131,7 +131,8 @@
@@ -28,5 +28,5 @@ index 1400ca8..f34356d 100644
  
  #ifdef HAVE_ARPA_NAMESER_H
 -- 
-2.34.1
+2.47.1
 
