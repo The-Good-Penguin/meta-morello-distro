@@ -29,7 +29,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/cheri-patches:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 TOOLCHAIN                = "${MORELLO_TOOLCHAIN}"
 
-PV   = "5.0.38"
+PV   = "5.0.43"
 PNPV = "zabbix-${PV}"
 SRC_URI = " \
     https://cdn.zabbix.com/zabbix/sources/stable/5.0/${PNPV}.tar.gz \
@@ -46,10 +46,11 @@ SRC_URI += "file://0000-sysinfo-fix-build-with-musl-libc.patch \
             file://0007-duktape-fix-stack-reallocation.patch \
             "
 
+
 S = "${WORKDIR}/zabbix-${PV}"
 
-SRC_URI[md5sum]    = "0d314f8626cf5e914204c7e0c4f9ca78"
-SRC_URI[sha256sum] = "765c36aa0fc9dbf27f9eab06ccfe4e71023264d398d361b1dae0a3c1fe4c1a26"
+SRC_URI[md5sum]    = "b9f9ccd8a0075eb8eb96cb1c4a6ef802"
+SRC_URI[sha256sum] = "97830a5817d79858d31883af9a00aedcfba8e51063b5801521220f227bcf8a87"
 
 DEPENDS += "postgresql-morello zlib-morello net-snmp-morello openldap-morello libpcre-morello libevent-morello"
 DEPENDS += "curl-morello"
