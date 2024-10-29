@@ -38,7 +38,9 @@ SRCREV    = "e94e514cac6a8ae2277b3e44970c734c9a066f34"
 
 S = "${WORKDIR}/git"
 
-CFLAGS:remove = "-O2"
+#CFLAGS:remove = "-O2"
+CFLAGS:remove =" -O0 -g"
+CFLAGS += "-O2"
 
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
